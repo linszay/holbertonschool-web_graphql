@@ -1,7 +1,18 @@
 const express = require('express');
 const {graphqlHTTP} = require('express-graphql');
+const mongoose = require('mongoose');
 
 const app = express();
+
+// connect to mongoDB atlas &  listen for connection
+mongoose.connect('<your-mongodb-atlas-connection-string>', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+mongoose.connection.once('open', () => {
+  console.log('Connected to database');
+});
 
 app.use('/graphql',graphqlHTTP({
 }));
