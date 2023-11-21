@@ -1,15 +1,12 @@
-const express = require('express');
-const graphql = require('graphql');
-const {graphqlHTTP} = require('express-graphql');
-const{ GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLID, GraphQLNonNull} = graphql;
-// import the TaskType from the schema.js file
-const TaskType = require('./schema');
-const _=require('lodash');
-const { TaskType, ProjectType } = require('./types');
-const Task = require('./models/task');
-const Project = require('./models/project');
+const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLID, GraphQLNonNull } = require('graphql');
+const { TaskType, ProjectType } = require('./types');  // Make sure this import is correct and the file exists
+const { graphqlHTTP } = require('express-graphql');
+const _ = require('lodash');
+const Task = require('../models/task');
+const Project = require('../models/project');
 
 const app = express();
+
 
 // commenting out for task 6
 // const tasks = [
@@ -93,7 +90,7 @@ const RootQuery = new GraphQLObjectType({
     projects: {
       type: new GraphQLList(ProjectType),
       resolve(parent, args) {
-        return projects;
+        return Project.findById(args.id);
       },
     },
     task: {
@@ -102,14 +99,14 @@ const RootQuery = new GraphQLObjectType({
         id: { type: GraphQLID },
       },
       resolve(parent, args) {
-        return _.find(tasks, { id: args.id });
+        return Task.find({});
       },
     },
     project: {
       type: ProjectType,
       args: { id: { type: GraphQLID}},
       resolve(parent, args){
-        return _.find(projects, { id: args.id});
+        return Project.find({});
        }
     },
   },
