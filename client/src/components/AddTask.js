@@ -3,6 +3,14 @@ import {
   //useEffect
 } from "react";
 
+const getProjectsQuery = gql`
+{
+  projects{
+    title
+    id
+  }
+}
+`;
 
 function AddTask(props) {
   const [inputs, setInputs] = useState({
@@ -94,4 +102,24 @@ function AddTask(props) {
   );
 }
 
-export default AddTask;
+function displayProjects() {
+  //  console.log(props);
+  var data = props.data;
+  if (data.loading) {
+    return ( < option > Loading projects... < /option>);
+    }
+    else {
+      return data.projects.map(project => {
+          return ( < option key = {
+              project.id
+            }
+            value = {
+              project.id
+            } > {
+              project.title
+            } < /option>);
+          })
+      }
+    }
+
+export default graphql(getProjectsQuery)(AddTask);

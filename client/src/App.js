@@ -17,6 +17,10 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+const cors = require{ cors }
+
+app.use(cors());
+
 const App = () => {
   return (
     <ApolloProvider client={client}>
