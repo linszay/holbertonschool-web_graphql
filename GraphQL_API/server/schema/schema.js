@@ -1,10 +1,13 @@
 const express = require('express');
 const graphql = require('graphql');
 const {graphqlHTTP} = require('express-graphql');
-const{ GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLID} = graphql;
+const{ GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLID, GraphQLNonNull} = graphql;
 // import the TaskType from the schema.js file
 const TaskType = require('./schema');
 const _=require('lodash');
+const { TaskType, ProjectType } = require('./types');
+const Task = require('./models/task');
+const Project = require('./models/project');
 
 const app = express();
 
@@ -112,6 +115,46 @@ const RootQuery = new GraphQLObjectType({
   },
 });
 
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    addProject: {
+      type: ProjectType,
+      args: {
+        title: { type: new GraphQLNonNull(GraphQLString) },
+        weight: { type: new GraphQLNonNull(GraphQLInt) },
+        description: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parent, args) {
+        const project = new Project({
+          title: args.title,
+          weight: args.weight,
+          description: args.description,
+        });
+        return project.save();
+      },
+    },
+    addTask: {
+      type: TaskType,
+      args: {
+        title: { type: new GraphQLNonNull(GraphQLString) },
+        weight: { type: new GraphQLNonNull(GraphQLInt) },
+        description: { type: new GraphQLNonNull(GraphQLString) },
+        projectId: { type: new GraphQLNonNull(GraphQLString) }, // Assuming you use String for projectId
+      },
+      resolve(parent, args) {
+        const task = new Task({
+          title: args.title,
+          weight: args.weight,
+          description: args.description,
+          projectId: args.projectId,
+        });
+        return task.save();
+      },
+    },
+  },
+});
+
 app.listen(4000, () => {
   console.log('now listening for request on port 4000');
 });
@@ -123,6 +166,7 @@ app.use('/graphql', graphqlHTTP({
 
 module.exports = new GraphQLSchema({
     query: RootQuery,
+    mutation: Mutation,
   });
 
 module.exports = TaskType;
